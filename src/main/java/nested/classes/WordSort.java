@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class WordSort {
     private List<String> words;
+    final Pattern p = Pattern.compile("\\W|\\d");
 
     public WordSort() {
         this.words = new LinkedList<>();
@@ -17,16 +18,10 @@ public class WordSort {
 
     @Override
     public String toString() {
-        StringBuilder representation = new StringBuilder();
-        for(String word : words) {
-            representation.append(word);
-            representation.append(System.lineSeparator());
-        }
-        return representation.toString();
+        return String.join(System.lineSeparator(), words);
     }
 
     public void addWords(String word) {
-        final Pattern p = Pattern.compile("\\W|\\d");
         Matcher m = p.matcher(word);
         if(m.find()) {
             throw new InputMismatchException("Only letters allowed.");
@@ -37,13 +32,7 @@ public class WordSort {
     static Comparator<String> comparator = new Comparator<String>() {
         @Override
         public int compare(String word1, String word2) {
-            if (word1.length() > word2.length()) {
-                return 1;
-            }
-            if (word1.length() < word2.length()) {
-                return -1;
-            }
-            return 0;
+            return Integer.compare(word1.length(), word2.length());
         }
     };
 }

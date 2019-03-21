@@ -37,10 +37,7 @@ public class WordSortTest {
         wordSort.getWords().add("serwerownia");
         wordSort.getWords().add("rogale");
 
-        String sample = "mirko" + System.lineSeparator() +
-                        "kosmonauta" + System.lineSeparator() +
-                        "serwerownia" + System.lineSeparator() +
-                        "rogale" + System.lineSeparator();
+        String sample = String.join(System.lineSeparator(), "mirko", "kosmonauta", "serwerownia", "rogale");
 
         assertEquals(sample, wordSort.toString());
     }
