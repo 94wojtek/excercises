@@ -1,6 +1,7 @@
 package nested.classes;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,12 +30,16 @@ public class WordSort {
         words.add(word);
     }
 
+    static Comparator<String> lambdaComparator = Comparator.comparingInt(String::length);
+
+    /*
     static Comparator<String> comparator = new Comparator<String>() {
         @Override
         public int compare(String word1, String word2) {
             return Integer.compare(word1.length(), word2.length());
         }
     };
+    */
 }
 
 class WordSortMain {
@@ -59,7 +64,7 @@ class WordSortMain {
         }
 
         System.out.println("Before sort: \n" + wordSort.toString());
-        Collections.sort(wordSort.getWords(), WordSort.comparator);
+        Collections.sort(wordSort.getWords(), WordSort.lambdaComparator);
         System.out.println("After sort: \n" + wordSort.toString());
     }
 }
