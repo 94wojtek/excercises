@@ -1,12 +1,14 @@
 package collections;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NamesCollection {
     private List<String> names;
     private static final Pattern p = Pattern.compile("\\W|\\d");
+    private StringBuilder namesRep = new StringBuilder();
 
     public NamesCollection() {
         this.names = new LinkedList<>();
@@ -35,7 +37,6 @@ public class NamesCollection {
 
     @Override
     public String toString() {
-        StringBuilder namesRep = new StringBuilder();
         for(String name : names) {
             namesRep.append(name);
             namesRep.append(System.lineSeparator());
@@ -72,7 +73,37 @@ class Whatever {
         System.out.println("Type name you wish to add or [-] to finish: ");
         Scanner input = new Scanner(System.in);
         String name;
+        Predicate<String> dashCheck = dash -> dash.equals("-");
 
+        try {
+            while (true) {
+                name = input.next();
+                if (dashCheck.test(name)) {
+                    break;
+                }
+                names.addName(name);
+            }
+            input.close();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            while (true) {
+                try {
+                    name = input.next();
+                    if (dashCheck.test(name)) {
+                        break;
+                    }
+                    names.addName(name);
+                } catch (IllegalArgumentException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            input.close();
+        } finally {
+            System.out.println(names.toString());
+            System.out.println("Number of unique names in the list: " + names.convertListToSet());
+        }
+
+        /*
         try {
             while (true) {
                 name = input.next();
@@ -100,5 +131,6 @@ class Whatever {
             System.out.println(names.toString());
             System.out.println("Number of unique names in the list: " + names.convertListToSet());
         }
+        */
     }
 }

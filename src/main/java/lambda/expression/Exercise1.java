@@ -1,13 +1,11 @@
 package lambda.expression;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Exercise1 {
     public static void main(String[] args) {
+
         List<String> words = new LinkedList<>();
         Scanner input = new Scanner(System.in);
         String word;

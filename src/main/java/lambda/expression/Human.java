@@ -24,7 +24,6 @@ public class Human {
 class HumanMain {
     public static void main(String[] args) {
         BiFunction<Integer, String, Human> create = Human::new;
-        create.apply(24, "wojtek");
         System.out.println(create.apply(24, "wojtek"));
     }
 }
