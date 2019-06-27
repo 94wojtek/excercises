@@ -1,5 +1,7 @@
 package junit5;
 
+
+import java.io.IOException;
 import java.math.BigDecimal;
 
 public class Currency implements CurrencyUnit {
@@ -8,14 +10,14 @@ public class Currency implements CurrencyUnit {
     private BigDecimal rate;
     private BigDecimal spread;
 
-    public Currency(BigDecimal amount) {
+    public Currency(BigDecimal amount) throws IOException {
         if(BigDecimal.ZERO.compareTo(amount) > 0) {
             throw new IllegalArgumentException("Amount can't be negative.");
         }
         this.amount = amount.setScale(SCALE, ROUNDING_MODE);
     }
 
-    public Currency(BigDecimal amount, BigDecimal rate, BigDecimal spread) {
+    public Currency(BigDecimal amount, BigDecimal rate, BigDecimal spread) throws IOException {
         if(BigDecimal.ZERO.compareTo(amount) > 0) {
             throw new IllegalArgumentException("Amount can't be negative.");
         }
@@ -68,15 +70,15 @@ public class Currency implements CurrencyUnit {
         return representation.toString();
     }
 
-    public Zloty convertToPln(BigDecimal rate) {
+    public Zloty convertToPln(BigDecimal rate) throws IOException {
         return new Zloty(this.amount.multiply(rate));
     }
 
-    public Euro convertToEur(BigDecimal rate) {
+    public Euro convertToEur(BigDecimal rate) throws IOException {
         return new Euro(this.amount.multiply(rate));
     }
 
-    public Dollar convertToUsd(BigDecimal rate) {
+    public Dollar convertToUsd(BigDecimal rate) throws IOException {
         return new Dollar(this.amount.multiply(rate));
     }
 }

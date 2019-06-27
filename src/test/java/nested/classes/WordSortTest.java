@@ -16,8 +16,15 @@ public class WordSortTest {
 
     @Test
     public void shouldCheckIfEquals() {
+        assertEquals(0, WordSort.lambdaComparator.compare("hej", "hej"));
+    }
+
+    /*
+    @Test
+    public void shouldCheckIfEquals() {
         assertEquals(0, wordSort.comparator.compare("hej", "hej"));
     }
+    */
 
     @Test
     public void shouldCheckIfAddWordsToList() {
