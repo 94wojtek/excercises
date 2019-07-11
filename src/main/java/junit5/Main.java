@@ -5,16 +5,17 @@ import java.math.BigDecimal;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        RatesGetter ratesGetter = new RatesGetter();
-        Euro eur = new Euro(BigDecimal.ONE, new BigDecimal(4.2745), new BigDecimal(0.2134));
-        Zloty pln = new Zloty(BigDecimal.ONE);
-        System.out.println(eur.toString());
 
-        // Zloty pln = eur.convertToPln(eur.getRate());
-        Zloty pln1 = eur.convertToPln(ratesGetter.rateFromAPI(pln.getCurrencyName().toString()));
+        Currency pln = new Zloty(BigDecimal.ONE);
+        Currency eur = new Euro(BigDecimal.ONE);
+        Currency usd = new Dollar(BigDecimal.ONE);
+
+        System.out.println(eur);
+
+        pln = usd.convertTo(CurrencyName.PLN);
         System.out.println(pln);
 
-        eur = pln.convertToEur(new BigDecimal(0.2326));
+        eur = eur.convertTo(CurrencyName.EUR);
         System.out.println(eur);
     }
 }

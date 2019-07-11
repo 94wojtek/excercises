@@ -1,6 +1,5 @@
 package junit5;
 
-
 import java.io.IOException;
 import java.math.BigDecimal;
 
@@ -9,15 +8,16 @@ public class Currency implements CurrencyUnit {
     private BigDecimal amount;
     private BigDecimal rate;
     private BigDecimal spread;
+    private String baseCurrencyUrl;
 
-    public Currency(BigDecimal amount) throws IOException {
+    public Currency(BigDecimal amount) {
         if(BigDecimal.ZERO.compareTo(amount) > 0) {
             throw new IllegalArgumentException("Amount can't be negative.");
         }
         this.amount = amount.setScale(SCALE, ROUNDING_MODE);
     }
 
-    public Currency(BigDecimal amount, BigDecimal rate, BigDecimal spread) throws IOException {
+    public Currency(BigDecimal amount, BigDecimal rate, BigDecimal spread) {
         if(BigDecimal.ZERO.compareTo(amount) > 0) {
             throw new IllegalArgumentException("Amount can't be negative.");
         }
@@ -70,15 +70,38 @@ public class Currency implements CurrencyUnit {
         return representation.toString();
     }
 
-    public Zloty convertToPln(BigDecimal rate) throws IOException {
-        return new Zloty(this.amount.multiply(rate));
-    }
+    public Currency convertTo(CurrencyName currencyToConvert) throws IOException {
+        Currency toReturn = new Currency(BigDecimal.ONE);
 
-    public Euro convertToEur(BigDecimal rate) throws IOException {
-        return new Euro(this.amount.multiply(rate));
-    }
+        if (currencyToConvert.equals(this.getCurrencyName())) {
+            throw new IllegalArgumentException("Can't convert to same currency.");
+        }
 
-    public Dollar convertToUsd(BigDecimal rate) throws IOException {
-        return new Dollar(this.amount.multiply(rate));
+        CurrencyName baseCurrencyName = this.getCurrencyName();
+        switch (baseCurrencyName) {
+            case EUR:
+                baseCurrencyUrl = "https://api.exchangeratesapi.io/latest";
+                break;
+            case USD:
+                baseCurrencyUrl = "https://api.exchangeratesapi.io/latest?base=USD";
+                break;
+            case PLN:
+                baseCurrencyUrl = "https://api.exchangeratesapi.io/latest?base=PLN";
+                break;
+        }
+        RatesGetter ratesGetter = new RatesGetter(baseCurrencyUrl);
+
+        switch (currencyToConvert) {
+            case EUR:
+                toReturn = new Euro(this.amount.multiply(ratesGetter.rateFromAPI(CurrencyName.EUR.toString())));
+                break;
+            case PLN:
+                toReturn = new Zloty(this.amount.multiply(ratesGetter.rateFromAPI(CurrencyName.PLN.toString())));
+                break;
+            case USD:
+                toReturn = new Dollar(this.amount.multiply(ratesGetter.rateFromAPI(CurrencyName.USD.toString())));
+                break;
+        }
+        return toReturn;
     }
 }

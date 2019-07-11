@@ -1,6 +1,8 @@
 package junit5;
 
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -24,16 +26,19 @@ class CurrencyNameExchangeTest {
     @Test
     void shouldntAcceptNegativeValues() {
         assertAll(
-                () -> assertThrows(IllegalArgumentException.class, () -> new Currency(BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE)),
-                () -> assertThrows(IllegalArgumentException.class, () -> new Currency(BigDecimal.ONE, BigDecimal.ONE.negate(), BigDecimal.ONE)),
-                () -> assertThrows(IllegalArgumentException.class, () ->  new Currency(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE.negate()))
+                () -> assertThrows(IllegalArgumentException.class,
+                                   () -> new Currency(BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE)),
+                () -> assertThrows(IllegalArgumentException.class,
+                                   () -> new Currency(BigDecimal.ONE, BigDecimal.ONE.negate(), BigDecimal.ONE)),
+                () -> assertThrows(IllegalArgumentException.class,
+                                   () ->  new Currency(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE.negate()))
         );
     }
 
     @Test
     void shouldThrowExceptionWhenNegativeAmount() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> new Currency(BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE));
+                                     () -> new Currency(BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE));
         assertEquals("Amount can't be negative.", e.getMessage());
     }
 
@@ -52,8 +57,20 @@ class CurrencyNameExchangeTest {
     }
 
     @Test
-    void shouldConvertToPln() {
-        assertEquals(BigDecimal.TEN.setScale(4, RoundingMode.CEILING), cur.convertToPln(BigDecimal.TEN).getAmount());
+    void shouldThrowExceptionWhenConvertToSameCurrency() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> cur.convertTo(CurrencyName.EUR));
+                assertEquals("Can't convert to same currency.", e.getMessage());
+    }
+
+    @Test
+    void shouldConvertToPln() throws IOException {
+        assertEquals(BigDecimal.valueOf(4.2681), cur.convertTo(CurrencyName.PLN).getAmount());
+    }
+
+    @Test
+    void shouldConvertToUsd() throws IOException {
+        assertEquals(BigDecimal.valueOf(1.1285), cur.convertTo(CurrencyName.USD).getAmount());
     }
 
     @Test
