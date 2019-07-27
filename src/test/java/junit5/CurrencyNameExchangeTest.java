@@ -10,49 +10,64 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyNameExchangeTest {
 
-    Euro cur = new Euro(BigDecimal.ONE, new BigDecimal(4.2924), new BigDecimal(0.0302));
+    Currency cur = new Currency(CurrencyName.EUR, BigDecimal.ONE, new BigDecimal(4.2924), new BigDecimal(0.0302));
 
     @Test
-    void shouldCreateCurrencyObject() {
-
-        assertAll(
-                () -> assertEquals(CurrencyName.EUR, cur.getCurrencyName()),
-                () -> assertEquals(BigDecimal.ONE.setScale(4, RoundingMode.CEILING), cur.getAmount()),
-                () -> assertEquals(new BigDecimal(4.2924).setScale(4, RoundingMode.CEILING), cur.getRate()),
-                () -> assertEquals(new BigDecimal(0.0302).setScale(4, RoundingMode.CEILING), cur.getSpread())
-        );
+    void shouldCreateCurrObjWithCorrectName() {
+        assertEquals(CurrencyName.EUR, cur.getCurrencyName());
     }
 
     @Test
-    void shouldntAcceptNegativeValues() {
-        assertAll(
-                () -> assertThrows(IllegalArgumentException.class,
-                                   () -> new Currency(BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE)),
-                () -> assertThrows(IllegalArgumentException.class,
-                                   () -> new Currency(BigDecimal.ONE, BigDecimal.ONE.negate(), BigDecimal.ONE)),
-                () -> assertThrows(IllegalArgumentException.class,
-                                   () ->  new Currency(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE.negate()))
-        );
+    void shouldCreateCurrObjWithCorrectAmount() {
+        assertEquals(BigDecimal.ONE.setScale(4, RoundingMode.CEILING), cur.getAmount());
+    }
+
+    @Test
+    void shouldCreateCurrObjWithCorrectRate() {
+        assertEquals(new BigDecimal(4.2924).setScale(4, RoundingMode.CEILING), cur.getRate());
+    }
+
+    @Test
+    void shouldCreateCurrObjWithCorrectSpread() {
+        assertEquals(new BigDecimal(0.0302).setScale(4, RoundingMode.CEILING), cur.getSpread());
+    }
+
+    @Test
+    void shouldntAcceptNegativeAmount() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Currency(CurrencyName.EUR, BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE));
+    }
+
+    @Test
+    void shouldntAcceptNegativeRate() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Currency(CurrencyName.EUR, BigDecimal.ONE, BigDecimal.ONE.negate(), BigDecimal.ONE));
+    }
+
+    @Test
+    void shouldntAcceptNegativeSpread() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Currency(CurrencyName.EUR, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE.negate()));
     }
 
     @Test
     void shouldThrowExceptionWhenNegativeAmount() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                                     () -> new Currency(BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE));
+                () -> new Currency(CurrencyName.EUR, BigDecimal.ONE.negate(), BigDecimal.ONE, BigDecimal.ONE));
         assertEquals("Amount can't be negative.", e.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenNegativeRate() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> new Currency(BigDecimal.ONE, BigDecimal.ONE.negate(), BigDecimal.ONE));
+                () -> new Currency(CurrencyName.EUR, BigDecimal.ONE, BigDecimal.ONE.negate(), BigDecimal.ONE));
         assertEquals("Rate can't be negative.", e.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenNegativeSpread() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () ->  new Currency(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE.negate()));
+                () -> new Currency(CurrencyName.EUR, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE.negate()));
                 assertEquals("Spread can't be negative.", e.getMessage());
     }
 
@@ -65,12 +80,12 @@ class CurrencyNameExchangeTest {
 
     @Test
     void shouldConvertToPln() throws IOException {
-        assertEquals(BigDecimal.valueOf(4.2681), cur.convertTo(CurrencyName.PLN).getAmount());
+        assertEquals(BigDecimal.valueOf(4.2670).setScale(4), cur.convertTo(CurrencyName.PLN).getAmount());
     }
 
     @Test
     void shouldConvertToUsd() throws IOException {
-        assertEquals(BigDecimal.valueOf(1.1285), cur.convertTo(CurrencyName.USD).getAmount());
+        assertEquals(BigDecimal.valueOf(1.1138).setScale(4), cur.convertTo(CurrencyName.USD).getAmount());
     }
 
     @Test

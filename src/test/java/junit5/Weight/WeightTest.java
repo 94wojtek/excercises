@@ -2,7 +2,6 @@ package junit5.Weight;
 
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WeightTest {
