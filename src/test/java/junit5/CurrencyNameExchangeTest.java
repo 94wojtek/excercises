@@ -1,11 +1,9 @@
 package junit5;
 
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyNameExchangeTest {
