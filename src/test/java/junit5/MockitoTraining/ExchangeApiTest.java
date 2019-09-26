@@ -1,74 +1,48 @@
 package junit5.MockitoTraining;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Currency;
-import java.util.InputMismatchException;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-class ExchangeApiTest {
+public class ExchangeApiTest {
+
+    private Exchange exchange;
+    private final static String SAMPLE_RESPONSE = "{\"table\":\"A\",\"currency\":\"funt szterling\",\"code\":\"GBP\",\"rates\":[{\"no\":\"186/A/NBP/2019\",\"effectiveDate\":\"2019-09-25\",\"mid\":4.9552}]}";
 
     @Mock
-    ExchangeApi exchangeApiMock;
-    Exchange exchangeTest;
-    RatesAPI ratesAPITest;
+    private ConnectionFactory connectionFactoryMock;
 
-    @Test
-    void verifyRightArgsTypes() throws IOException {
-        exchangeApiMock.exchangeRate(LocalDate.now(), "random");
-        verify(exchangeApiMock).exchangeRate(any(LocalDate.class), anyString());
+    @Mock
+    private UrlConnectionReader urlConnectionReaderMock;
+
+    @BeforeEach
+    void setUp() {
+        when(connectionFactoryMock.build(anyString())).thenReturn(urlConnectionReaderMock);
+        exchange = new Exchange(connectionFactoryMock);
     }
 
     @Test
-    void verifyExactArgs() throws IOException {
-        exchangeApiMock.exchangeRate(LocalDate.now(), "usd");
-        verify(exchangeApiMock).exchangeRate(eq(LocalDate.now()), eq("usd"));
+    void shouldReturnCorrectRate() {
+        when(urlConnectionReaderMock.response()).thenReturn(SAMPLE_RESPONSE);
+        BigDecimal rate = exchange.exchangeRate(LocalDate.of(2019, 9, 25), "GBP");
+        assertThat(rate, is(new BigDecimal("4.9552")));
     }
 
     @Test
-    void shouldThrowExceptionWhenWrongCurrCode() throws IOException {
-        String currencyCode = "random";
-        if (!Currency.getAvailableCurrencies().toString().contains(currencyCode.toUpperCase())) {
-            when(exchangeApiMock.exchangeRate(any(), eq(currencyCode)))
-                    .thenThrow(new InputMismatchException("No such a currency"));
-        }
-        assertThrows(InputMismatchException.class,
-                () -> exchangeApiMock.exchangeRate(LocalDate.now(), currencyCode));
-    }
-
-    @Test
-    void shouldReturnCorrectRate() throws IOException {
-        when(exchangeApiMock.exchangeRate(eq(LocalDate.of(2018, 11, 30)), eq("USD")))
-                .thenReturn(BigDecimal.valueOf(3.7731));
-
-        assertEquals(BigDecimal.valueOf(3.7731),
-                exchangeApiMock.exchangeRate(LocalDate.of(2018, 11, 30), "USD"));
-    }
-
-    @Test
-    void shouldRetrieveCorrectRate() throws IOException {
-        ratesAPITest = new RatesAPI("http://api.nbp.pl/api/exchangerates/rates/a/GBP/2019-08-21/?format=json");
-        assertEquals(BigDecimal.valueOf(4.7623), ratesAPITest.rateFromAPI());
-    }
-
-    @Test
-    void shouldDisplayCorrectly() throws IOException {
-        exchangeTest = new Exchange();
-        exchangeTest.exchangeRate(LocalDate.of(2019, 8, 21), "GBP");
-        String representation = "PLN converted to GBP for the date 2019-08-21 is 4.7623";
-        assertEquals(representation, exchangeTest.toString());
+    void shouldConnectToRightUrl() {
+        when(urlConnectionReaderMock.response()).thenReturn(SAMPLE_RESPONSE);
+        exchange.exchangeRate(LocalDate.of(2019, 9, 25), "GBP");
+        verify(connectionFactoryMock).build("http://api.nbp.pl/api/exchangerates/rates/a/GBP/2019-09-25/?format=json");
     }
 }
